@@ -1,6 +1,5 @@
 import * as t from "drizzle-orm/pg-core";
 import { users } from "./user.schema";
-import { experimental_taintObjectReference } from "react";
 import { experienceLevelEnum, genderEnum } from "./column.helper";
 
 /*

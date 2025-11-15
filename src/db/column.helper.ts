@@ -5,7 +5,7 @@ export const timestamps = {
   created_at: t.timestamp().defaultNow().notNull(),
 };
 
-export const roleEnum = t.pgEnum("roles", ["user"]);
+export const roleEnum = t.pgEnum("roles", ["user", "planter"]);
 
 export const experienceLevelEnum = t.pgEnum("experience_level", [
   "beginner",
