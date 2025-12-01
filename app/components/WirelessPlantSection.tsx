@@ -1,164 +1,166 @@
 "use client"
-
-import { motion } from "framer-motion"
+import { motion, type Variants } from "framer-motion"
 import { useTheme } from "../context/ThemeContext"
-import Image from "next/image"
-export default function WirelessPlantSection() {
-  const { getThemeColors } = useTheme()
-  const themeColors = getThemeColors()
-  return (
-    <section className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 py-16 md:py-20 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
+import { Sprout, Video} from "lucide-react"
+
+  export default function WirelessPlantSection() {
+    const { getThemeColors } = useTheme()
+    const themeColors = getThemeColors()
+
+    const containerVariants: Variants = {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.1,
+          delayChildren: 0.2,
+        },
+      },
+    }
+
+    const itemVariants: Variants = {
+      hidden: { opacity: 0, y: 20 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.6, ease: "easeOut" },
+      },
+    }
+
+    return (
+      <section className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 py-16 md:py-24 relative overflow-hidden">
+
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl mix-blend-multiply"
+            style={{ backgroundColor: `${themeColors.primary}20` }}
+          />
+          <div
+            className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full blur-3xl mix-blend-multiply"
+            style={{ backgroundColor: `${themeColors.secondary}20` }}
+          />
+        </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          className="text-center mb-16 md:mb-20"
+          className="max-w-7xl mx-auto w-full relative z-10"
         >
-          <motion.div
-            initial={{ width: 0 }}
-            whileInView={{ width: 64 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="h-px mx-auto mb-6 md:mb-8"
-            style={{ background: themeColors.primary }}
-          />
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-light text-slate-900 mb-4">Wireless Plant</h2>
-          <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto font-light leading-relaxed">
-            Layanan tanam bersama dapat memesan jasa penanaman untuk mendapatkan hasil panen melalui sistem bagi
-            hasil. Dapat menggunakan fitur video call langsung dari website ini.
-          </p>
-        </motion.div>
-
-         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-16 md:mb-20">
-          
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            viewport={{ once: true }}
-            className="space-y-6"
-          >
-  
-            <div className="grid hidden md:block md:grid-cols-1 gap-6 md:gap-8 max-w-6xl mx-auto">
-              {/* Community Image 1 */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="relative rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group"
-              >
-                <img
-                  src="Wireless.png"
-                  alt="Komunitas"
-                  className="w-full h-auto object-cover"
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 auto-rows-max">
+            <motion.div variants={itemVariants} className="col-span-1 md:col-span-4 lg:col-span-6">
+              <div className="text-center md:col-span-12 bg-white/100 rounded-[2.5rem] p-8 md:p-10 shadow-lg text-white relative overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: 60 }}
+                  transition={{ duration: 0.8, delay: 0.3 }}
+                  viewport={{ once: true }}
+                  className="h-1 mx-auto mb-6 rounded-full"
+                  style={{ background: themeColors.primary }}
                 />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `${themeColors.primary}20` }}
-                />
-              </motion.div>
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-light text-slate-900 leading-[1.1] tracking-tight mb-6">
+                  Wireless 
+                  <br /> <span className="font-medium">Plant</span>
+                </h2>
+                <p className="text-lg text-slate-600 max-w-2xl mx-auto font-light">
+                  Layanan tanam bersama dengan sistem bagi hasil yang menguntungkan dan transparan
+                </p>
+              </div>
+            </motion.div>
 
-              {/* Community Image 2 */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                className="relative rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group mt-4"
-              >
-                <img
-                  src="Wireless2.png"
-                  alt="Wireless"
-                  className="w-full h-auto object-cover"
-                />
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `${themeColors.secondary}20` }}
-                />
-              </motion.div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="space-y-8"
-          >
-            <div className="space-y-4 md:space-y-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 p-4 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl sm:text-2xl">🌱</span>
-                </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-1">Sistem Bagi Hasil</h3>
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Investasi tanaman herbal dengan sistem bagi hasil yang menguntungkan dan transparan.
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 p-4 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl sm:text-2xl">📹</span>
-                </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-1">Video Call Langsung</h3>
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Konsultasi langsung dengan petani ahli melalui video call terintegrasi di platform.
-                  </p>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.7 }}
-                viewport={{ once: true }}
-                className="flex items-start gap-4 p-4 sm:p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-md hover:shadow-lg transition-all duration-300"
-              >
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl sm:text-2xl">👥</span>
-                </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-1">Komunitas Aktif</h3>
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-                    Bergabung dengan komunitas petani herbal untuk berbagi pengalaman dan tips.
-                  </p>    
-                </div>
-              </motion.div>
-            </div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              viewport={{ once: true }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4"
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              className="col-span-1 md:col-span-2 lg:col-span-3 row-span-2 bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 group relative"
             >
+              <img
+                src="/Wireless.png"
+                alt="Wireless Plant Community"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ background: `linear-gradient(to top, ${themeColors.primary}40, transparent)` }}
+              />
+            </motion.div>
+
+      
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ y: -4 }}
+              className="col-span-1 md:col-span-2 lg:col-span-1 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+            >
+              <div>
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                  style={{ backgroundColor: `${themeColors.primary}20` }}
+                >
+                  <Sprout className="text-2xl text-green-900 "/>
+                </div>
+                <h3 className="text-xl font-medium text-slate-900 mb-2">Sistem Bagi Hasil</h3>
+                <p className="text-slate-600 text-sm font-light leading-relaxed">
+                  Investasi tanaman herbal dengan sistem bagi hasil yang menguntungkan dan transparan
+                </p>
+              </div>
+            </motion.div>
+
+  
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ y: -4 }}
+              className="col-span-1 md:col-span-2 lg:col-span-1 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+            >
+              <div>
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                  style={{ backgroundColor: `${themeColors.primary}20` }}
+                >
+                  <Video className="text-2xl text-green-900"/>
+                </div>
+                <h3 className="text-xl font-medium text-slate-900 mb-2">Video Call Langsung</h3>
+                <p className="text-slate-600 text-sm font-light leading-relaxed">
+                  Konsultasi langsung dengan petani ahli melalui video call terintegrasi di platform
+                </p>
+              </div>
+            </motion.div>
+
+
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              className="col-span-1 md:col-span-2 lg:col-span-2 bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 group relative"
+            >
+              <img
+                src="/Wireless2.png"
+                alt="Wireless Plant System"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ background: `linear-gradient(to top, ${themeColors.secondary}40, transparent)` }}
+              />
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              className="col-span-1 md:col-span-4 lg:col-span-6 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden group flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})`,
+              }}
+            >
+              <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -ml-10 -mt-10" />
+              <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl mr-10 mb-10" />
+
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-white transition-all duration-300 rounded-full shadow-lg hover:shadow-xl group text-sm sm:text-base font-semibold"
-                style={{
-                  background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})`
-                }}
+                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-slate-900 rounded-full font-medium shadow-lg hover:shadow-xl transition-all group/btn relative z-10"
               >
                 <span>Mulai Sekarang</span>
                 <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform"
+                  className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -166,12 +168,9 @@ export default function WirelessPlantSection() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </motion.button>
-
             </motion.div>
-          </motion.div>
-        </div>
-
-      </div>
-    </section>
-  )
-}
+          </div>
+        </motion.div>
+      </section>
+    )
+  }

@@ -6,6 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useTheme } from "../context/ThemeContext"
 import { Home, MessageCircle, ScanLine, Sprout, Users, User, Leaf, ShieldAlert } from "lucide-react"
+import HerbismLogo from "./HerbismLogo"
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -73,20 +74,24 @@ export default function Navbar() {
         style={{ opacity: navbarOpacity }}
         className={`hidden md:block fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled
-            ? "bg-white/90 backdrop-blur-xl shadow-lg border-b border-emerald-100"
-            : "bg-transparent"
+            ? "bg-white/95 backdrop-blur-xl shadow-lg border-b border-emerald-100/50"
+            : "bg-white/80 backdrop-blur-md"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo kek gmana asu asu jembut */}
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex items-center justify-between h-11 md:h-22">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="flex items-center"
+              className="flex items-center gap-1"
             >
-              <Image src="/Logo.png" alt="Logo" width={40} height={40} />
+              <div className="relative">
+                <HerbismLogo 
+                  color={themeColors.primary}
+                  className="w-28 h-auto"
+                />
+              </div>
             </motion.div>
 
             {/* Desktop Navigation */}
@@ -110,7 +115,7 @@ export default function Navbar() {
                     onClick={() => !item.hasDropdown && scrollToSection(item.id)}
                     className="relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300"
                     style={{
-                      color: activeSection === item.id ? "white" : isScrolled ? "#334155" : "#1e293b"
+                      color: activeSection === item.id ? "white" : isScrolled ? "#475569" : "#334155"
                     }}
                     onMouseEnter={(e) => {
                       if (activeSection !== item.id) {
@@ -119,7 +124,7 @@ export default function Navbar() {
                     }}
                     onMouseLeave={(e) => {
                       if (activeSection !== item.id) {
-                        e.currentTarget.style.color = isScrolled ? "#334155" : "#1e293b"
+                        e.currentTarget.style.color = isScrolled ? "#475569" : "#334155"
                       }
                     }}
                   >
@@ -135,7 +140,7 @@ export default function Navbar() {
                     </span>
                   </motion.button>
 
-                  {/* Dropdown Menu Mobel */}
+                  {/* Dropdown Menu Desktop */}
                   {item.hasDropdown && (
                     <AnimatePresence>
                       {showScanDropdown && (
@@ -144,27 +149,34 @@ export default function Navbar() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-64 bg-white rounded-2xl shadow-2xl border overflow-hidden"
-                          style={{ borderColor: `${themeColors.primary}20` }}
+                          className="absolute top-full mt-3 left-1/2 -translate-x-1/2 w-72 bg-white rounded-2xl shadow-2xl border-2 overflow-hidden"
+                          style={{ borderColor: `${themeColors.primary}25` }}
                         >
                           {scanOptions.map((option, idx) => (
                             <motion.button
                               key={option.id}
                               onClick={() => scrollToSection(option.id)}
-                              className="w-full px-4 py-3 flex items-start gap-3 transition-all duration-200 hover:bg-slate-50"
-                              whileHover={{ x: 4 }}
+                              className="w-full px-5 py-4 flex items-start gap-4 transition-all duration-200"
+                              whileHover={{ x: 6 }}
                               style={{
-                                borderBottom: idx === 0 ? `1px solid ${themeColors.primary}10` : 'none'
+                                borderBottom: idx === 0 ? `1px solid ${themeColors.primary}15` : 'none',
+                                backgroundColor: 'transparent'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = `${themeColors.primary}08`
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent'
                               }}
                             >
                               <div 
-                                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                                style={{ background: `${themeColors.primary}15` }}
+                                className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                                style={{ background: `${themeColors.primary}18` }}
                               >
-                                <option.icon size={20} style={{ color: themeColors.primary }} />
+                                <option.icon size={22} style={{ color: themeColors.primary }} strokeWidth={2} />
                               </div>
                               <div className="flex-1 text-left">
-                                <div className="text-sm font-medium text-slate-900">{option.label}</div>
+                                <div className="text-sm font-semibold text-slate-900">{option.label}</div>
                                 <div className="text-xs text-slate-500 mt-0.5">{option.description}</div>
                               </div>
                             </motion.button>
@@ -203,21 +215,34 @@ export default function Navbar() {
                 </motion.button>
               ) : (
                 // Login/Register Buttons
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Link href="/login">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-5 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 rounded-full transition-all duration-300"
+                      className="px-6 py-2.5 text-sm font-medium rounded-full transition-all duration-300 border-2"
+                      style={{
+                        color: themeColors.primary,
+                        borderColor: `${themeColors.primary}30`,
+                        backgroundColor: `${themeColors.primary}08`
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = `${themeColors.primary}15`
+                        e.currentTarget.style.borderColor = `${themeColors.primary}50`
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = `${themeColors.primary}08`
+                        e.currentTarget.style.borderColor = `${themeColors.primary}30`
+                      }}
                     >
                       Masuk
                     </motion.button>
                   </Link>
                   <Link href="/register">
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
+                      whileHover={{ scale: 1.05, y: -2 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-5 py-2 text-sm text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="px-6 py-2.5 text-sm text-white rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                       style={{ background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})` }}
                     >
                       Daftar
@@ -340,7 +365,7 @@ export default function Navbar() {
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none" />
           
-          <div className="relative bg-white/95 backdrop-blur-xl border-t shadow-2xl" style={{ borderColor: `${themeColors.primary}15` }}>
+          <div className="relative bg-white/98 backdrop-blur-xl border-t-2 shadow-2xl" style={{ borderColor: `${themeColors.primary}20` }}>
             <div className="max-w-md mx-auto px-4 py-2">
               <div className="flex items-center justify-between relative">
                 

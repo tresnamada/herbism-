@@ -5,11 +5,14 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { useTheme } from "../context/ThemeContext"
 import { ThemeProvider } from "../context/ThemeContext"
+import HerbismLogo from "../components/HerbismLogo"
 
 function RegisterContent() {
   const [formData, setFormData] = useState({
+    username: "",
     name: "",
     email: "",
+    city: "",
     password: "",
     confirmPassword: ""
   })
@@ -21,7 +24,7 @@ function RegisterContent() {
     // Handle register logic here
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -30,7 +33,7 @@ function RegisterContent() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-hidden">
-      {/* Animated Background */}
+
       <div className="absolute inset-0 bg-white">
         <div 
           className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-20 animate-pulse"
@@ -49,7 +52,7 @@ function RegisterContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
+        className="w-full max-w-lg"
       >
         {/* Card */}
         <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 sm:p-10">
@@ -59,13 +62,17 @@ function RegisterContent() {
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
-              className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
+              className="w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center p-4"
               style={{ 
-                background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})`,
-                boxShadow: `0 10px 40px ${themeColors.primary}30`
+                background: `linear-gradient(135deg, ${themeColors.primary}15, ${themeColors.secondary}15)`,
+                boxShadow: `0 10px 40px ${themeColors.primary}20`,
+                border: `2px solid ${themeColors.primary}25`
               }}
             >
-              <span className="text-3xl">🌱</span>
+              <HerbismLogo 
+                color={themeColors.primary}
+                className="w-full h-auto"
+              />
             </motion.div>
             <h1 className="text-3xl sm:text-4xl font-light text-slate-900 mb-2">
               Create Account
@@ -77,6 +84,39 @@ function RegisterContent() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Username */}
+            <div className="relative">
+              <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">
+                Username
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-slate-50/50 border border-slate-200/50 focus:outline-none transition-all duration-300 text-slate-900"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = themeColors.primary
+                    e.target.style.background = 'white'
+                    e.target.style.boxShadow = `0 0 0 4px ${themeColors.primary}08`
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e2e8f080'
+                    e.target.style.background = '#f8fafc80'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                  placeholder="Username"
+                  required
+                />
+              </div>
+            </div>
+
             {/* Name */}
             <div className="relative">
               <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">
@@ -85,7 +125,7 @@ function RegisterContent() {
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
                 <input
@@ -104,7 +144,7 @@ function RegisterContent() {
                     e.target.style.background = '#f8fafc80'
                     e.target.style.boxShadow = 'none'
                   }}
-                  placeholder="Halomek"
+                  placeholder="Nama"
                   required
                 />
               </div>
@@ -137,7 +177,7 @@ function RegisterContent() {
                     e.target.style.background = '#f8fafc80'
                     e.target.style.boxShadow = 'none'
                   }}
-                  placeholder="your@email.com"
+                  placeholder="@email.com"
                   required
                 />
               </div>
@@ -170,8 +210,43 @@ function RegisterContent() {
                     e.target.style.background = '#f8fafc80'
                     e.target.style.boxShadow = 'none'
                   }}
-                  placeholder="Create a password"
+                  placeholder="Minimal 8 karakter"
                   required
+                  minLength={8}
+                />
+              </div>
+            </div>
+
+            {/* Confirm Password */}
+            <div className="relative">
+              <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-wide">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-slate-50/50 border border-slate-200/50 focus:outline-none transition-all duration-300 text-slate-900"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = themeColors.primary
+                    e.target.style.background = 'white'
+                    e.target.style.boxShadow = `0 0 0 4px ${themeColors.primary}08`
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e2e8f080'
+                    e.target.style.background = '#f8fafc80'
+                    e.target.style.boxShadow = 'none'
+                  }}
+                  placeholder="Ulangi password"
+                  required
+                  minLength={8}
                 />
               </div>
             </div>

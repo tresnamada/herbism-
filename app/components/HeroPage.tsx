@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
-import ParallaxLeaf from "./ParallaxLeaf"
+import GrassParallax from "./GrassParallax"
 import { useTheme } from "../context/ThemeContext"
 
 type TherapyMode = "default" | "calm" | "energy" | "balance" | "healing"
@@ -63,9 +63,8 @@ export default function HeroPage() {
     <div
       className={`min-h-screen bg-gradient-to-br ${currentTheme.bg} relative overflow-hidden overflow-x-hidden transition-all duration-1000 ease-in-out pt-16 md:pt-0`}
     >
-      {/* Parallax Daun */}
-      <ParallaxLeaf side="left" mode={currentMode} />
-      <ParallaxLeaf side="right" mode={currentMode} />
+      {/* Grass Parallax Effect */}
+      <GrassParallax mode={currentMode} />
 
       <motion.div
         className="relative z-10 flex min-h-screen items-center justify-center px-4 sm:px-6"
@@ -76,7 +75,7 @@ export default function HeroPage() {
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: isLoaded ? 0 : 50, opacity: isLoaded ? 1 : 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light ${currentTheme.accent} text-balance`}
+            className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight ${currentTheme.accent} text-balance`}
           >
             HERBISM
           </motion.h1>
@@ -87,9 +86,9 @@ export default function HeroPage() {
             transition={{ duration: 0.8, delay: 1 }}
             className="space-y-4"
           >
-            <p className="text-base sm:text-lg text-gray-700 font-light">Temukan Kekuatan Berkebun Herba</p>
+            <p className="text-base sm:text-lg text-gray-700 font-light">Temukan Kekuatan Berkebun Herbal</p>
             <p className="text-sm sm:text-base text-gray-600 font-light max-w-xl mx-auto leading-relaxed">
-              Tanam, rawat, dan rasakan manfaat alami herba langsung dari kebun Anda sendiri.
+              Tanam, rawat, dan rasakan manfaat alami herbal langsung dari kebun Anda sendiri.
             </p>
           </motion.div>
 
@@ -99,7 +98,7 @@ export default function HeroPage() {
             transition={{ duration: 0.8, delay: 1.6 }}
             className="space-y-4"
           >
-            <p className="text-xs sm:text-sm text-gray-600 font-light uppercase tracking-wide">Pilih Mood mu</p>
+            <p className="text-xs sm:text-sm text-gray-600 font-light tracking-wide">Pilih Moodmu Dalam Menanam!</p>
             <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
               {Object.entries(therapyModes).map(([mode, config]) => (
                 <button
@@ -126,10 +125,10 @@ export default function HeroPage() {
             <button
               className={`${currentTheme.button} text-white px-8 sm:px-10 py-3 sm:py-3 rounded-full text-sm sm:text-base font-light shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`}
             >
-              Start Growing
+              Mulai Menanam
             </button>
             <button className="bg-white/60 text-gray-700 px-8 sm:px-10 py-3 sm:py-3 rounded-full text-sm sm:text-base font-light shadow-lg hover:shadow-xl hover:bg-white transform hover:scale-105 transition-all duration-300">
-              Learn More
+              Pelajari Lebih Lanjut
             </button>
           </motion.div>
         </div>

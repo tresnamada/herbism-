@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { useTheme } from "../context/ThemeContext"
 import { ThemeProvider } from "../context/ThemeContext"
+import HerbismLogo from "../components/HerbismLogo"
 
 function LoginContent() {
   const [email, setEmail] = useState("")
@@ -48,13 +49,17 @@ function LoginContent() {
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
-              className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
+              className="w-24 h-24 mx-auto mb-6 rounded-2xl flex items-center justify-center p-4"
               style={{ 
-                background: `linear-gradient(135deg, ${themeColors.primary}, ${themeColors.secondary})`,
-                boxShadow: `0 10px 40px ${themeColors.primary}30`
+                background: `linear-gradient(135deg, ${themeColors.primary}15, ${themeColors.secondary}15)`,
+                boxShadow: `0 10px 40px ${themeColors.primary}20`,
+                border: `2px solid ${themeColors.primary}25`
               }}
             >
-              <span className="text-3xl">🌿</span>
+              <HerbismLogo 
+                color={themeColors.primary}
+                className="w-full h-auto"
+              />
             </motion.div>
             <h1 className="text-3xl sm:text-4xl font-light text-slate-900 mb-2">
               Welcome Back
@@ -92,7 +97,7 @@ function LoginContent() {
                     e.target.style.background = '#f8fafc80'
                     e.target.style.boxShadow = 'none'
                   }}
-                  placeholder="your@email.com"
+                  placeholder="@email.com"
                   required
                 />
               </div>
