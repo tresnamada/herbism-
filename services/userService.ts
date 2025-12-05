@@ -1,5 +1,5 @@
 import { db } from "@/lib/firebase";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, onSnapshot } from "firebase/firestore";
 export type User = {
   email: string;
   name?: string;
@@ -42,9 +42,27 @@ export const updateProfile = async (uid: string, data: Partial<User>) => {
 
 // selesaikan onboarding user
 export const completeOnboarding = async (uid: string, onboardingData: Partial<User>) => {
+  try {
+    const userRef = doc(db, "profiles", uid);
+    await updateDoc(userRef, {
+      ...onboardingData,
+      isOnboardingComplete: true,
+    });
+    console.log("Onboarding completed and saved to Firestore for:", uid);
+  } catch (error) {
+    console.error("Error saving onboarding data to Firestore:", error);
+    throw error;
+  }
+};
+
+// dengerin perubahan user realtime
+export const listenToUser = (uid: string, callback: (user: User | null) => void) => {
   const userRef = doc(db, "profiles", uid);
-  await updateDoc(userRef, {
-    ...onboardingData,
-    isOnboardingComplete: true,
+  return onSnapshot(userRef, (doc) => {
+    if (doc.exists()) {
+      callback(doc.data() as User);
+    } else {
+      callback(null);
+    }
   });
 };

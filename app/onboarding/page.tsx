@@ -29,9 +29,9 @@ export default function CompleteProfilePage() {
   const router = useRouter()
   const { popupState, closePopup, showSuccess, showError } = usePopup()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+
   const primaryColor = "#10b981" // 
-  
+
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState<ProfileFormData>({
     username: "",
@@ -52,7 +52,7 @@ export default function CompleteProfilePage() {
 
   // Common health conditions
   const healthConditions = [
-    "Diabetes", "Hipertensi", "Asma", "Alergi", "Jantung", 
+    "Diabetes", "Hipertensi", "Asma", "Alergi", "Jantung",
     "Kolesterol", "Asam Urat", "Maag", "Tidak Ada", "Lainnya (tulis sendiri)"
   ]
 
@@ -87,14 +87,14 @@ export default function CompleteProfilePage() {
         age: typeof formData.age === 'number' ? formData.age : undefined,
         gender: formData.gender || undefined,
         region: formData.region,
-        healthCondition: formData.healthCondition === "Lainnya (tulis sendiri)" 
-          ? customHealthCondition 
+        healthCondition: formData.healthCondition === "Lainnya (tulis sendiri)"
+          ? customHealthCondition
           : formData.healthCondition,
-        healthGoals: formData.healthGoals === "Lainnya (tulis sendiri)" 
-          ? customHealthGoal 
+        healthGoals: formData.healthGoals === "Lainnya (tulis sendiri)"
+          ? customHealthGoal
           : formData.healthGoals,
-        allergies: formData.allergies === "Lainnya (tulis sendiri)" 
-          ? customAllergy 
+        allergies: formData.allergies === "Lainnya (tulis sendiri)"
+          ? customAllergy
           : formData.allergies,
         experienceLevel: formData.experienceLevel || undefined
       }
@@ -169,10 +169,9 @@ export default function CompleteProfilePage() {
             {[1, 2, 3, 4].map((s) => (
               <div
                 key={s}
-                className={`flex-1 mx-1 h-2 rounded-full transition-all duration-300 ${
-                  s <= step ? 'opacity-100' : 'opacity-30'
-                }`}
-                style={{ 
+                className={`flex-1 mx-1 h-2 rounded-full transition-all duration-300 ${s <= step ? 'opacity-100' : 'opacity-30'
+                  }`}
+                style={{
                   backgroundColor: s <= step ? primaryColor : '#e2e8f0'
                 }}
               />
@@ -193,12 +192,12 @@ export default function CompleteProfilePage() {
           className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100"
         >
           <form onSubmit={handleSubmit}>
-            
+
             {/* Step 1:*/}
             {step === 1 && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-medium text-slate-900 mb-6">Informasi Dasar</h2>
-                
+
                 {/* Username */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -228,7 +227,7 @@ export default function CompleteProfilePage() {
                     placeholder="Masukkan nama lengkap Anda"
                   />
                 </div>
-                
+
                 {/* umur */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -260,11 +259,10 @@ export default function CompleteProfilePage() {
                         key={option.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, gender: option.value as Gender })}
-                        className={`px-4 py-3 rounded-2xl border-2 transition-all font-medium ${
-                          formData.gender === option.value
+                        className={`px-4 py-3 rounded-2xl border-2 transition-all font-medium ${formData.gender === option.value
                             ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                             : 'border-slate-200 hover:border-slate-300 text-slate-700'
-                        }`}
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -294,18 +292,17 @@ export default function CompleteProfilePage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-medium text-slate-900 mb-2">Kondisi Kesehatan</h2>
                 <p className="text-sm text-slate-600 mb-6">Pilih satu kondisi kesehatan yang Anda miliki</p>
-                
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {healthConditions.map((condition) => (
                     <button
                       key={condition}
                       type="button"
                       onClick={() => setFormData({ ...formData, healthCondition: condition })}
-                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${
-                        formData.healthCondition === condition
+                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${formData.healthCondition === condition
                           ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                           : 'border-slate-200 hover:border-slate-300 text-slate-700'
-                      }`}
+                        }`}
                     >
                       {condition}
                     </button>
@@ -337,18 +334,17 @@ export default function CompleteProfilePage() {
               <div className="space-y-6">
                 <h2 className="text-2xl font-medium text-slate-900 mb-2">Tujuan Kesehatan</h2>
                 <p className="text-sm text-slate-600 mb-6">Pilih satu tujuan kesehatan Anda</p>
-                
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {healthGoalsList.map((goal) => (
                     <button
                       key={goal}
                       type="button"
                       onClick={() => setFormData({ ...formData, healthGoals: goal })}
-                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium text-left ${
-                        formData.healthGoals === goal
+                      className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium text-left ${formData.healthGoals === goal
                           ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                           : 'border-slate-200 hover:border-slate-300 text-slate-700'
-                      }`}
+                        }`}
                     >
                       {goal}
                     </button>
@@ -381,18 +377,17 @@ export default function CompleteProfilePage() {
                 <div>
                   <h2 className="text-2xl font-medium text-slate-900 mb-2">Alergi</h2>
                   <p className="text-sm text-slate-600 mb-4">Pilih salah satu alergi yang Anda miliki</p>
-                  
+
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
                     {allergiesList.map((allergy) => (
                       <button
                         key={allergy}
                         type="button"
                         onClick={() => setFormData({ ...formData, allergies: allergy })}
-                        className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${
-                          formData.allergies === allergy
+                        className={`px-4 py-3 rounded-2xl border-2 transition-all text-sm font-medium ${formData.allergies === allergy
                             ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                             : 'border-slate-200 hover:border-slate-300 text-slate-700'
-                        }`}
+                          }`}
                       >
                         {allergy}
                       </button>
@@ -421,7 +416,7 @@ export default function CompleteProfilePage() {
                 <div>
                   <h2 className="text-2xl font-medium text-slate-900 mb-2">Tingkat Pengalaman</h2>
                   <p className="text-sm text-slate-600 mb-4">Seberapa berpengalaman Anda dengan tanaman herbal?</p>
-                  
+
                   <div className="space-y-3">
                     {[
                       { value: "beginner", label: "Pemula", desc: "Baru mengenal tanaman herbal" },
@@ -432,26 +427,23 @@ export default function CompleteProfilePage() {
                         key={option.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, experienceLevel: option.value as ExperienceLevel })}
-                        className={`w-full px-6 py-4 rounded-2xl border-2 transition-all text-left ${
-                          formData.experienceLevel === option.value
+                        className={`w-full px-6 py-4 rounded-2xl border-2 transition-all text-left ${formData.experienceLevel === option.value
                             ? 'border-emerald-500 bg-emerald-50'
                             : 'border-slate-200 hover:border-slate-300'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${
-                            formData.experienceLevel === option.value
+                          <div className={`w-5 h-5 rounded-full border-2 mt-0.5 flex items-center justify-center ${formData.experienceLevel === option.value
                               ? 'border-emerald-500 bg-emerald-500'
                               : 'border-slate-300'
-                          }`}>
+                            }`}>
                             {formData.experienceLevel === option.value && (
                               <div className="w-2 h-2 bg-white rounded-full" />
                             )}
                           </div>
                           <div>
-                            <div className={`font-medium ${
-                              formData.experienceLevel === option.value ? 'text-emerald-700' : 'text-slate-900'
-                            }`}>
+                            <div className={`font-medium ${formData.experienceLevel === option.value ? 'text-emerald-700' : 'text-slate-900'
+                              }`}>
                               {option.label}
                             </div>
                             <div className="text-sm text-slate-600">{option.desc}</div>
@@ -475,7 +467,7 @@ export default function CompleteProfilePage() {
                   Kembali
                 </button>
               )}
-              
+
               {step < 4 ? (
                 <button
                   type="button"
@@ -510,15 +502,7 @@ export default function CompleteProfilePage() {
           </form>
         </motion.div>
 
-        {/* Skip button */}
-        <div className="text-center mt-6">
-          <button
-            onClick={() => router.push("/")}
-            className="text-sm text-slate-500 hover:text-slate-700 font-light transition-colors"
-          >
-            Lewati untuk saat ini
-          </button>
-        </div>
+
       </motion.div>
 
       {/* Custom Popup */}

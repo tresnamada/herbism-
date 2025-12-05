@@ -7,9 +7,16 @@ import {
   signOut,
   onAuthStateChanged,
   getAdditionalUserInfo,
+  setPersistence,
+  browserLocalPersistence
 } from "@firebase/auth";
 import { createProfile } from "./userService";
 import { getFirebaseErrorMessage } from "@/utils/firebaseErrors";
+
+// Explicitly set persistence to local
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error("Error setting persistence:", error);
+});
 
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
