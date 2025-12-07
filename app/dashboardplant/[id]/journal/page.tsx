@@ -8,27 +8,37 @@ import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 
 // Mock
-const mockJournals = [
+interface JournalEntry {
+  week: number;
+  date: string;
+  note: string;
+  image: string;
+  aiFeedback?: string;
+}
+
+// Mock
+// Initial data
+const initialJournals: JournalEntry[] = [
   {
     week: 1,
     date: "10 Okt 2025",
     note: "Tanaman baru saja ditanam. Kondisi tanah gembur dan lembab. Cuaca cerah mendukung pertumbuhan awal.",
     image: "/plants/journal-1.jpg",
-    aiFeedback: "Awal yang sangat baik! Kondisi tanah yang gembur dan lembab sangat ideal untuk pertumbuhan awal. Pastikan untuk menjaga kelembaban tanah secara konsisten dalam 2 minggu pertama. Cuaca cerah memang mendukung, namun hindari paparan sinar matahari langsung yang terlalu lama."
+    // aiFeedback: "..." (Cleared to show button)
   },
   {
     week: 2,
     date: "17 Okt 2025",
     note: "Tunas mulai muncul. Tinggi sekitar 2cm. Penyiraman rutin setiap pagi. Tidak ada tanda hama.",
     image: "/plants/journal-2.jpg",
-    aiFeedback: "Pertumbuhan tunas pada minggu ke-2 menunjukkan perkembangan yang sehat! Tinggi 2cm adalah progres yang baik. Penyiraman pagi hari sudah tepat, namun pertimbangkan untuk menambah penyiraman sore hari jika cuaca sangat panas. Terus pantau tanda-tanda hama secara rutin."
+    // aiFeedback: "..." (Cleared to show button)
   },
   {
     week: 3,
     date: "24 Okt 2025",
     note: "Daun pertama mulai mekar. Pertumbuhan sangat baik. Diberi pupuk organik sedikit untuk mempercepat pertumbuhan.",
     image: "/plants/journal-3.jpg",
-    aiFeedback: "Luar biasa! Daun pertama yang mekar adalah tanda tanaman berkembang dengan baik. Pemberian pupuk organik pada minggu ke-3 sudah tepat waktu. Pastikan tidak memberikan pupuk berlebihan - 'sedikit' adalah kunci. Lanjutkan perawatan rutin dan perhatikan warna daun untuk memastikan nutrisi tercukupi."
+    // aiFeedback: "..." (Cleared to show button)
   },
 ]
 
@@ -37,10 +47,13 @@ export default function JournalPage() {
   const params = useParams()
   const { getThemeColors } = useTheme()
   const themeColors = getThemeColors()
+  const [journals, setJournals] = useState<JournalEntry[]>(initialJournals)
   const [currentPage, setCurrentPage] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [loadingFeedback, setLoadingFeedback] = useState<number | null>(null)
+  
   const [formData, setFormData] = useState({
-    week: mockJournals.length + 1,
+    week: journals.length + 1,
     date: "",
     note: ""
   })
@@ -51,7 +64,43 @@ export default function JournalPage() {
   ])
   const [chatInput, setChatInput] = useState("")
 
-  const totalPages = Math.ceil(mockJournals.length / 2)
+  const totalPages = Math.ceil(journals.length / 2)
+  
+  const handleSaveJournal = () => {
+    const newJournal = {
+      week: formData.week,
+      date: new Date(formData.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      note: formData.note,
+      image: imagePreview || "/plants/journal-default.jpg", // Fallback image
+      aiFeedback: undefined // Start without feedback
+    }
+    
+    setJournals([...journals, newJournal])
+    setIsModalOpen(false)
+    setFormData({ week: journals.length + 2, date: "", note: "" })
+    setImagePreview(null)
+    
+    // Go to the last page to see new entry
+    const newTotalPages = Math.ceil((journals.length + 1) / 2)
+    if (newTotalPages > totalPages) {
+      setCurrentPage(newTotalPages - 1)
+    }
+  }
+
+  const handleRequestFeedback = (index: number) => {
+    setLoadingFeedback(index)
+    
+    // Simulate AI processing
+    setTimeout(() => {
+      const updatedJournals = [...journals]
+      updatedJournals[index] = {
+        ...updatedJournals[index],
+        aiFeedback: "Berdasarkan catatan Anda, perkembangan tanaman terlihat sangat positif! Perawatan yang Anda lakukan sudah tepat. Sarankan untuk tetap menjaga konsistensi penyiraman dan mulai perhatikan nutrisi tambahan jika diperlukan."
+      }
+      setJournals(updatedJournals)
+      setLoadingFeedback(null)
+    }, 2000)
+  }
   
   const nextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -80,8 +129,10 @@ export default function JournalPage() {
     setChatInput("")
   }
 
-  const leftEntry = mockJournals[currentPage * 2]
-  const rightEntry = mockJournals[currentPage * 2 + 1]
+  const leftEntryIndex = currentPage * 2
+  const rightEntryIndex = currentPage * 2 + 1
+  const leftEntry = journals[leftEntryIndex]
+  const rightEntry = journals[rightEntryIndex]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
@@ -185,18 +236,38 @@ export default function JournalPage() {
                         </p>
                       </div>
 
-                      {/* AI Feedback */}
-                      {leftEntry.aiFeedback && (
-                        <div className="mt-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border-2 border-purple-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Sparkles className="w-4 h-4 text-purple-600" />
-                            <h4 className="text-sm font-bold text-purple-900">Feedback dari Erbis</h4>
+                      {/* AI Feedback Section */}
+                      <div className="mt-6">
+                        {leftEntry.aiFeedback ? (
+                          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border-2 border-purple-200">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Sparkles className="w-4 h-4 text-purple-600" />
+                              <h4 className="text-sm font-bold text-purple-900">Feedback dari Erbis</h4>
+                            </div>
+                            <p className="text-sm text-purple-800 leading-relaxed">
+                              {leftEntry.aiFeedback}
+                            </p>
                           </div>
-                          <p className="text-sm text-purple-800 leading-relaxed">
-                            {leftEntry.aiFeedback}
-                          </p>
-                        </div>
-                      )}
+                        ) : (
+                          <button
+                            onClick={() => handleRequestFeedback(leftEntryIndex)}
+                            disabled={loadingFeedback === leftEntryIndex}
+                            className="w-full py-3 px-4 rounded-xl border-2 border-purple-200 border-dashed hover:border-purple-400 bg-purple-50 hover:bg-purple-100 flex items-center justify-center gap-2 text-purple-700 font-medium transition-all group"
+                          >
+                            {loadingFeedback === leftEntryIndex ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                                <span>Menganalisis...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                <span>Minta Masukan Erbis</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <div className="h-full flex items-center justify-center text-amber-300">
@@ -272,18 +343,38 @@ export default function JournalPage() {
                         </p>
                       </div>
 
-                      {/* AI Feedback */}
-                      {rightEntry.aiFeedback && (
-                        <div className="mt-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border-2 border-purple-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Sparkles className="w-4 h-4 text-purple-600" />
-                            <h4 className="text-sm font-bold text-purple-900">Feedback dari Erbis</h4>
+                      {/* AI Feedback Section */}
+                      <div className="mt-6">
+                        {rightEntry.aiFeedback ? (
+                          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-4 border-2 border-purple-200">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Sparkles className="w-4 h-4 text-purple-600" />
+                              <h4 className="text-sm font-bold text-purple-900">Feedback dari Erbis</h4>
+                            </div>
+                            <p className="text-sm text-purple-800 leading-relaxed">
+                              {rightEntry.aiFeedback}
+                            </p>
                           </div>
-                          <p className="text-sm text-purple-800 leading-relaxed">
-                            {rightEntry.aiFeedback}
-                          </p>
-                        </div>
-                      )}
+                        ) : (
+                          <button
+                            onClick={() => handleRequestFeedback(rightEntryIndex)}
+                            disabled={loadingFeedback === rightEntryIndex}
+                            className="w-full py-3 px-4 rounded-xl border-2 border-purple-200 border-dashed hover:border-purple-400 bg-purple-50 hover:bg-purple-100 flex items-center justify-center gap-2 text-purple-700 font-medium transition-all group"
+                          >
+                            {loadingFeedback === rightEntryIndex ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                                <span>Menganalisis...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                <span>Minta Masukan Erbis</span>
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <div className="h-full flex items-center justify-center text-amber-300">
@@ -470,7 +561,7 @@ export default function JournalPage() {
                   <button
                     onClick={() => {
                       setIsModalOpen(false)
-                      setFormData({ week: mockJournals.length + 1, date: "", note: "" })
+                      setFormData({ week: journals.length + 1, date: "", note: "" })
                       setImagePreview(null)
                     }}
                     className="flex-1 py-3 rounded-xl bg-amber-200 text-amber-800 font-semibold hover:bg-amber-300 transition-colors"
@@ -478,13 +569,7 @@ export default function JournalPage() {
                     Batal
                   </button>
                   <button
-                    onClick={() => {
-                      // TODO: Save journal entry
-                      console.log("Saving journal:", { ...formData, image: imagePreview })
-                      setIsModalOpen(false)
-                      setFormData({ week: mockJournals.length + 1, date: "", note: "" })
-                      setImagePreview(null)
-                    }}
+                    onClick={handleSaveJournal}
                     style={{ backgroundColor: themeColors.primary }}
                     className="flex-[2] py-3 rounded-xl text-white font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                   >
@@ -602,9 +687,6 @@ export default function JournalPage() {
                   <Send className="w-5 h-5" />
                 </button>
               </div>
-              <p className="text-xs text-slate-400 mt-2 text-center">
-                Powered by AI • Respon mungkin tidak selalu akurat
-              </p>
             </div>
           </motion.div>
         )}
