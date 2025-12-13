@@ -21,11 +21,15 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { getPlantById, Plant } from "@/services/plantService"
+import { getPlantJournalEntries } from "@/services/journalService"
+import { chatWithPlantAI } from "@/services/geminiService"
+import { useAuth } from "../../context/AuthContext"
 
 export default function PlantProfilePage() {
   const router = useRouter()
   const params = useParams()
   const { getThemeColors } = useTheme()
+  const { user } = useAuth()
   const themeColors = getThemeColors()
 
   const [plant, setPlant] = useState<Plant | null>(null)
@@ -34,20 +38,42 @@ export default function PlantProfilePage() {
 
   const [questionInput, setQuestionInput] = useState("")
   const [isConsulting, setIsConsulting] = useState(false)
-  const [faqList, setFaqList] = useState<Array<{q: string, a: string}>>([])
+  const [faqList, setFaqList] = useState<Array<{ q: string, a: string }>>([])
 
   const handleConsultation = async () => {
-    if (!questionInput.trim() || !plant) return
-    
+    if (!questionInput.trim() || !plant || !user) return
+
     const currentQ = questionInput
     setQuestionInput("") // Clear input immediately
     setIsConsulting(true)
 
     try {
-      // Call AI Service
-      
+      // 1. Fetch Journals for Context
+      const journals = await getPlantJournalEntries(user?.uid || "", plant.id!)
+
+      // 2. Format Journals for AI
+      const formattedJournals = journals.slice(0, 5).map((j, i) => ({
+        week: journals.length - i, // Approximate week
+        date: j.createdAt?.toLocaleDateString('id-ID') || "",
+        note: j.content,
+        feedbackData: j.feedbackData
+      }))
+
+      // 3. Call AI Service
+      const answer = await chatWithPlantAI(
+        plant,
+        {
+          experienceLevel: user.experienceLevel,
+          healthCondition: user.healthCondition,
+          healthGoals: user.healthGoals,
+          allergies: user.allergies
+        },
+        formattedJournals,
+        currentQ
+      )
+
       // Add to FAQ List (Newest on top)
-      setFaqList(prev => [{ q: currentQ, a: "" }, ...prev])
+      setFaqList(prev => [{ q: currentQ, a: answer }, ...prev])
     } catch (error) {
       console.error(error)
       alert("Maaf, Erbis sedang sibuk. Coba lagi nanti.")
@@ -159,13 +185,22 @@ export default function PlantProfilePage() {
         >
           <div className="grid md:grid-cols-2 gap-6">
             {/* Image */}
-            <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-emerald-100 to-teal-100">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-emerald-300">
-                  <Leaf className="w-20 h-20 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm font-medium">Foto Tanaman</p>
+            {/* Image */}
+            <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-emerald-100 to-teal-100 overflow-hidden">
+              {plant.imageUrl ? (
+                <img
+                  src={plant.imageUrl}
+                  alt={plant.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center text-emerald-300">
+                    <Leaf className="w-20 h-20 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm font-medium">Foto Tanaman</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Info */}
@@ -314,89 +349,89 @@ export default function PlantProfilePage() {
           transition={{ delay: 0.3 }}
           className="space-y-6"
         >
-           {/* Header & Input Section */}
-           <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-lg">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
-                  <Bot className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-xl text-slate-900">Tanya Erbis</h3>
-                  <p className="text-slate-500 text-sm">Asisten ahli tanaman pribadi Anda</p>
-                </div>
+          {/* Header & Input Section */}
+          <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
+                <Bot className="w-7 h-7 text-white" />
               </div>
-
-              <div className="relative">
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={questionInput}
-                    onChange={(e) => setQuestionInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleConsultation()}
-                    placeholder={`Tanya apapun tentang ${plant.name}...`}
-                    className="flex-1 px-5 py-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all shadow-inner"
-                  />
-                  <button
-                    onClick={handleConsultation}
-                    disabled={!questionInput.trim() || isConsulting}
-                    className="w-14 h-auto rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white flex items-center justify-center shadow-lg shadow-emerald-200 active:scale-95 transition-all"
-                  >
-                    {isConsulting ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                       <Send className="w-6 h-6" />
-                    )}
-                  </button>
-                </div>
-                <p className="text-xs text-slate-400 mt-2 ml-1">
-                  *Jawaban dihasilkan oleh AI dan dirancang untuk memberikan edukasi mendalam.
-                </p>
+              <div>
+                <h3 className="font-bold text-xl text-slate-900">Tanya Erbis</h3>
+                <p className="text-slate-500 text-sm">Asisten ahli tanaman pribadi Anda</p>
               </div>
-           </div>
+            </div>
 
-           {/* FAQ Results List */}
-           <div className="space-y-4">
-              <AnimatePresence>
-                {faqList.map((item, idx) => (
-                  <motion.div
-                    key={`${idx}-${item.q.substring(0, 10)}`}
-                    initial={{ opacity: 0, y: 20, height: 0 }}
-                    animate={{ opacity: 1, y: 0, height: 'auto' }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    {/* Question Header */}
-                    <div className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 flex items-start gap-3">
-                      <div className="bg-emerald-100 p-1.5 rounded-lg mt-0.5">
-                        <MessageSquare className="w-4 h-4 text-emerald-700" />
-                      </div>
-                      <h4 className="font-bold text-slate-800 text-lg leading-snug">{item.q}</h4>
-                    </div>
-                    
-                    {/* Answer Body */}
-                    <div className="p-6 bg-white">
-                      <div className="flex gap-4">
-                        <div className="flex-shrink-0">
-                           <Bot className="w-6 h-6 text-emerald-600 mt-1" />
-                        </div>
-                        <div className="flex-1 prose prose-emerald prose-sm max-w-none">
-                           <p className="text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">
-                             {item.a}
-                           </p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+            <div className="relative">
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={questionInput}
+                  onChange={(e) => setQuestionInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleConsultation()}
+                  placeholder={`Tanya apapun tentang ${plant.name}...`}
+                  className="flex-1 px-5 py-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all shadow-inner"
+                />
+                <button
+                  onClick={handleConsultation}
+                  disabled={!questionInput.trim() || isConsulting}
+                  className="w-14 h-auto rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white flex items-center justify-center shadow-lg shadow-emerald-200 active:scale-95 transition-all"
+                >
+                  {isConsulting ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send className="w-6 h-6" />
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-slate-400 mt-2 ml-1">
+                *Jawaban dihasilkan oleh AI dan dirancang untuk memberikan edukasi mendalam.
+              </p>
+            </div>
+          </div>
 
-              {faqList.length === 0 && !isConsulting && (
-                <div className="text-center py-10 opacity-50">
-                  <Bot className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                  <p className="text-slate-500 font-medium">Belum ada pertanyaan diajukan.</p>
-                </div>
-              )}
-           </div>
+          {/* FAQ Results List */}
+          <div className="space-y-4">
+            <AnimatePresence>
+              {faqList.map((item, idx) => (
+                <motion.div
+                  key={`${idx}-${item.q.substring(0, 10)}`}
+                  initial={{ opacity: 0, y: 20, height: 0 }}
+                  animate={{ opacity: 1, y: 0, height: 'auto' }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Question Header */}
+                  <div className="bg-slate-50/80 px-6 py-4 border-b border-slate-100 flex items-start gap-3">
+                    <div className="bg-emerald-100 p-1.5 rounded-lg mt-0.5">
+                      <MessageSquare className="w-4 h-4 text-emerald-700" />
+                    </div>
+                    <h4 className="font-bold text-slate-800 text-lg leading-snug">{item.q}</h4>
+                  </div>
+
+                  {/* Answer Body */}
+                  <div className="p-6 bg-white">
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0">
+                        <Bot className="w-6 h-6 text-emerald-600 mt-1" />
+                      </div>
+                      <div className="flex-1 prose prose-emerald prose-sm max-w-none">
+                        <p className="text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">
+                          {item.a}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+
+            {faqList.length === 0 && !isConsulting && (
+              <div className="text-center py-10 opacity-50">
+                <Bot className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+                <p className="text-slate-500 font-medium">Belum ada pertanyaan diajukan.</p>
+              </div>
+            )}
+          </div>
         </motion.div>
       </main>
     </div>

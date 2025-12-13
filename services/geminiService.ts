@@ -12,6 +12,12 @@ export interface PlantAIData {
   specialCare?: string[];
 }
 
+export interface JournalFeedback {
+  summary: string;
+  growthRating: number; // 1-5 stars
+  tips: string[];
+}
+
 export interface UserContext {
   experienceLevel?: "beginner" | "intermediate" | "expert";
   healthCondition?: string[];
@@ -25,7 +31,7 @@ export async function validateAndGeneratePlantData(
   userContext?: UserContext
 ): Promise<PlantAIData> {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     // Build user context description
     let userContextDescription = "";
@@ -36,9 +42,8 @@ export async function validateAndGeneratePlantData(
           intermediate: "tingkat menengah dengan pengalaman berkebun",
           expert: "ahli dengan pengalaman luas dalam tanaman herbal",
         };
-        userContextDescription += `\nTingkat Pengalaman User: ${
-          levelMap[userContext.experienceLevel]
-        }`;
+        userContextDescription += `\nTingkat Pengalaman User: ${levelMap[userContext.experienceLevel]
+          }`;
       }
       if (
         userContext.healthCondition &&
@@ -151,5 +156,116 @@ PENTING:
       throw error;
     }
     throw new Error("Gagal memvalidasi tanaman dengan AI. Silakan coba lagi.");
+  }
+}
+
+export async function generateJournalFeedback(
+  currentJournal: string,
+  previousJournal: string | null,
+  plantType: string,
+  plantName: string
+): Promise<JournalFeedback> {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    const prompt = `Kamu adalah ahli botani AI bernama Erbis. Analisis perkembangan tanaman berikut:
+
+Nama Tanaman: ${plantName}
+Jenis Tanaman: ${plantType}
+
+Jurnal Minggu Ini: "${currentJournal}"
+${previousJournal ? `Jurnal Minggu Lalu: "${previousJournal}"` : "Ini adalah jurnal pertama."}
+
+Tugas:
+1. Bandingkan kondisi minggu ini dengan minggu lalu (jika ada).
+2. Berikan rating pertumbuhan (1-5 bintang) berdasarkan kesehatan dan progress.
+3. Berikan 2-3 tips perawatan spesifik untuk minggu depan.
+4. Buat ringkasan singkat (maksimal 2 kalimat) yang menyemangati user.
+
+Output JSON:
+{
+  "summary": "Ringkasan singkat yang ramah dan menyemangati",
+  "growthRating": 4, // Integer 1-5
+  "tips": ["Tip 1", "Tip 2"]
+}
+
+PENTING:
+- Gunakan bahasa Indonesia yang ramah dan suportif.
+- Output HANYA JSON valid.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    // Clean up JSON
+    let jsonText = text.trim();
+    jsonText = jsonText.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+
+    return JSON.parse(jsonText) as JournalFeedback;
+
+  } catch (error: any) {
+    console.error("Error generating feedback:", error);
+    throw new Error("Gagal menganalisis jurnal. Silakan coba lagi.");
+  }
+}
+
+export async function chatWithPlantAI(
+  plant: any,
+  userContext: UserContext | undefined,
+  journals: any[],
+  question: string
+): Promise<string> {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    // 1. Build Context String
+    let context = `Informasi Tanaman:
+- Nama: ${plant.name}
+- Jenis: ${plant.kind}
+- Umur: ${plant.plantedDate} (Tanggal Tanam)
+- Media Tanam: ${plant.soilType}
+- Jadwal Siram: ${plant.wateringSchedule}
+- Jadwal Pupuk: ${plant.fertilizerSchedule}
+- Perawatan Khusus: ${plant.specialCare?.join(", ") || "-"}
+`;
+
+    if (userContext) {
+      context += `\nProfil User:
+- Pengalaman: ${userContext.experienceLevel || "-"}
+- Kondisi Kesehatan: ${userContext.healthCondition?.join(", ") || "-"}
+- Tujuan: ${userContext.healthGoals?.join(", ") || "-"}
+- Alergi: ${userContext.allergies?.join(", ") || "-"}
+`;
+    }
+
+    if (journals.length > 0) {
+      context += `\nRiwayat Jurnal Terakhir (3 terbaru):
+${journals.slice(0, 3).map((j, i) =>
+        `${i + 1}. [Minggu ${j.week}] ${j.date}: "${j.note}" (Feedback AI: ${j.feedbackData?.summary || "-"})`
+      ).join("\n")}
+`;
+    }
+
+    const prompt = `Kamu adalah Erbis, asisten ahli tanaman herbal yang ramah dan pintar.
+    
+CONTEXT:
+${context}
+
+PERTANYAAN USER:
+"${question}"
+
+INSTRUKSI:
+Jawab pertanyaan user dengan ramah, suportif, dan berdasarkan data tanaman di atas.
+Jika ada info dari jurnal yang relevan, sebutkan untuk menunjukkan kamu "ingat" kondisi tanaman.
+Berikan jawaban yang praktis dan tidak terlalu panjang (maksimal 3 paragraf).
+Gunakan bahasa Indonesia yang natural.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+
+  } catch (error: any) {
+    console.error("Error chatting with AI:", error);
+    throw new Error("Maaf, Erbis sedang pusing. Coba tanya lagi nanti ya.");
   }
 }

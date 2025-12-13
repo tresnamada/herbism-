@@ -21,8 +21,20 @@ export type JournalEntry = {
     createdAt?: Date;
     plantGrowth?: string;
     imageUrl?: string;
-    aiFeedback?: string;
+    aiFeedback?: string; // Legacy simple string
+    feedbackId?: string; // Reference to feedback doc
+    feedbackData?: JournalFeedbackData; // Hydrated data
 };
+
+export interface JournalFeedbackData {
+    id?: string;
+    journalId: string;
+    plantId: string;
+    summary: string;
+    growthRating: number;
+    tips: string[];
+    createdAt: Date;
+}
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -79,27 +91,64 @@ export const createJournalEntry = async (entryData: Omit<JournalEntry, "id" | "c
     }
 };
 
-// Get all journal entries for a SPECIFIC PLANT
+// Save AI Feedback
+export const saveJournalFeedback = async (data: Omit<JournalFeedbackData, "id" | "createdAt">) => {
+    try {
+        const docRef = await addDoc(collection(db, "feedbacks"), {
+            ...data,
+            createdAt: Timestamp.now(),
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error("Error saving feedback:", error);
+        throw error;
+    }
+};
+
+// Get all journal entries for a SPECIFIC PLANT (Merged with Feedback)
 export const getPlantJournalEntries = async (userId: string, plantId: string): Promise<JournalEntry[]> => {
     try {
-        const q = query(
+        // 1. Fetch Journals
+        const qJournal = query(
             collection(db, "journals"),
             where("userId", "==", userId),
             where("plantId", "==", plantId),
             orderBy("createdAt", "desc")
         );
-        const querySnapshot = await getDocs(q);
+        const journalSnap = await getDocs(qJournal);
 
-        const entries: JournalEntry[] = [];
-        querySnapshot.forEach((doc) => {
-            entries.push({
+        const journals: JournalEntry[] = [];
+        journalSnap.forEach((doc) => {
+            journals.push({
                 id: doc.id,
                 ...doc.data(),
                 createdAt: doc.data().createdAt?.toDate(),
             } as JournalEntry);
         });
 
-        return entries;
+        // 2. Fetch Feedbacks for this plant
+        const qFeedback = query(
+            collection(db, "feedbacks"),
+            where("plantId", "==", plantId)
+        );
+        const feedbackSnap = await getDocs(qFeedback);
+        const feedbacks: Record<string, JournalFeedbackData> = {};
+
+        feedbackSnap.forEach((doc) => {
+            const data = doc.data();
+            feedbacks[data.journalId] = {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate()
+            } as JournalFeedbackData;
+        });
+
+        // 3. Merge
+        return journals.map(journal => ({
+            ...journal,
+            feedbackData: journal.id ? feedbacks[journal.id] : undefined
+        }));
+
     } catch (error) {
         console.error("Error fetching journal entries:", error);
         throw error;
