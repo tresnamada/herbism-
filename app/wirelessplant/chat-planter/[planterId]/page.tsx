@@ -284,7 +284,7 @@ export default function ChatPlanterPage() {
           >
             <div className="flex items-center gap-4">
               <Link href="/wirelessplant">
-                <button className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center">
+                <button className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-900">
                   <ArrowLeft className="w-5 h-5" />
                 </button>
               </Link>
@@ -400,7 +400,7 @@ export default function ChatPlanterPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             onSubmit={handleSendMessage}
-            className="bg-white rounded-b-3xl p-4 shadow-sm border border-slate-200 border-t-0 flex items-center gap-3"
+            className="bg-white rounded-b-3xl p-4 shadow-sm border border-slate-200 border-t-0 flex items-center gap-3 text-slate-900"
           >
             <input
               type="text"
